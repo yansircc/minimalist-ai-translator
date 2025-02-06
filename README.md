@@ -1,29 +1,79 @@
-# Create T3 App
+# Minimalist AI Translator
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+[English](README.md) | [中文](README.zh-CN.md)
 
-## What's next? How do I make an app with this?
+A beautiful and super convenient AI translation tool, crafted for "traditionalists" who need a modern translation experience.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## 🌟 Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- **Minimalist Design** - Clean interface, no ads, no distractions
+- **Smart Interaction** - Automatic language detection, instant translation
+- **Multiple Models** - Support for Gemini, GPT-4, Groq, DeepSeek and more
+- **Shortcuts** - Keyboard shortcuts for efficient translation
+- **Responsive Design** - Perfect for both desktop and mobile
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## 🚀 Quick Start
 
-## Learn More
+### Prerequisites
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- Node.js >= 18.0.0
+- Package Manager: [Bun](https://bun.sh) (recommended) or npm
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Installation Steps
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+1. Clone the repository
 
-## How do I deploy this?
+```bash
+git clone https://github.com/yourusername/ai-translate.git
+cd ai-translate
+```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+2. Install dependencies
+
+```bash
+# Using Bun (Recommended for better performance)
+bun install
+
+# Or using npm
+npm install
+```
+
+3. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Then edit the `.env` file and add your API keys
+
+4. Start the development server
+
+```bash
+# Using Bun (Recommended)
+bun dev
+
+# Or using npm
+npm run dev
+```
+
+Now open [http://localhost:3000](http://localhost:3000) to use it!
+
+## 📝 Usage
+
+### Basic Operations
+
+- **Input Text** - Type or paste text in the left panel
+- **Translate** - Press Enter to start translation
+- **Line Break** - Use Shift + Enter for new lines
+- **Copy Result** - Results are automatically copied to clipboard
+- **Toggle Theme** - Click the theme icon in top-left
+- **Switch Model** - Use the model selector at the top
+- **Reset** - Click the center Logo to reset everything
+
+## 🤝 Contributing
+
+Pull requests and issues are welcome!
+
+## 📜 License
+
+[MIT License](LICENSE)
