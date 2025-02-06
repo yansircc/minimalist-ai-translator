@@ -5,8 +5,8 @@ import { type Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "AI Translator",
-  description: "A minimalist AI-powered translator",
+  title: "AI极简翻译",
+  description: "一个极简的AI翻译工具，比deepl和google翻译更好用",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

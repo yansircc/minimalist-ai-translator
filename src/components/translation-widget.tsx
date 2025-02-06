@@ -3,7 +3,6 @@
 
 import React, { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useChat } from "ai/react";
-import { Loader2 } from "lucide-react";
 import { Toast } from "@/components/ui/toast";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { CopyButton } from "@/components/translation/copy-button";
@@ -46,10 +45,17 @@ export default function TranslationWidget() {
     },
     onFinish: (message) => {
       console.log("Translation completed");
-      setShouldAnimateLogo(true);
-      // Use the message from the callback instead of accessing messages array
+      // First stop the loading animation
+      setShouldAnimateLogo(false);
+
+      // Then trigger the success animation after a short delay
+      setTimeout(() => {
+        setShouldAnimateLogo(true);
+        setTimeout(() => setShouldAnimateLogo(false), 1000);
+      }, 100);
+
+      // Handle clipboard copy
       if (message) {
-        // Also trim the text before copying to clipboard
         navigator.clipboard.writeText(message.content.trim()).then(
           () => {
             console.log("翻译结果已自动复制到剪贴板");
@@ -61,7 +67,6 @@ export default function TranslationWidget() {
           },
         );
       }
-      setTimeout(() => setShouldAnimateLogo(false), 2000);
     },
   });
 
@@ -129,7 +134,10 @@ export default function TranslationWidget() {
       >
         <ThemeToggle />
         <ModelSelect value={selectedModel} onChange={setSelectedModel} />
-        <Logo onReset={handleReset} shouldAnimate={shouldAnimateLogo} />
+        <Logo
+          onReset={handleReset}
+          shouldAnimate={shouldAnimateLogo || isLoading}
+        />
         {translatedText && <CopyButton text={translatedText} />}
       </div>
 
@@ -177,16 +185,6 @@ export default function TranslationWidget() {
           </div>
         </div>
       </div>
-
-      {/* Loading overlay */}
-      {isLoading && (
-        <div
-          className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
-          data-test="loading-overlay"
-        >
-          <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
-        </div>
-      )}
 
       {/* Toast notification */}
       {showToast && <Toast message="已复制到剪贴板" data-test="copy-toast" />}
