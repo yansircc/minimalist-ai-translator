@@ -49,7 +49,7 @@ describe("Basic UI Elements", () => {
       .should("have.value", "google");
 
     // Check all options exist
-    cy.get('[data-test="model-select"] option').should("have.length", 3);
+    cy.get('[data-test="model-select"] option').should("have.length", 4);
 
     // Check each option individually
     cy.get('[data-test="model-option-groq"]')

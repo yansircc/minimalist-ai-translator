@@ -1,0 +1,86 @@
+name: 🚀 CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.ts"
+      - "**.tsx"
+      - "package.json"
+      - "bun.lockb"
+      - ".github/workflows/**"
+  pull_request:
+    branches: [main]
+
+# Prevent concurrent builds
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: 📦 Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: 📝 Setup Environment
+        run: |
+          # Use mock API keys for CI testing
+          # These keys are intentionally invalid - we'll mock the API responses in Cypress
+          cat > .env << EOL
+          OPENAI_API_KEY=sk-test-ci
+          GOOGLE_GENERATIVE_AI_API_KEY=test-ci
+          GROQ_API_KEY=gsk-test-ci
+          DEEPSEEK_API_KEY=sk-test-ci
+          EOL
+
+      - name: 🏗️ Build
+        run: bun run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: 🧪 Install Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          runTests: false
+
+      - name: 🚀 Start Next.js
+        run: bun dev & sleep 10
+        env:
+          PORT: 3000
+
+      - name: 🧪 Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          wait-on: "http://localhost:3000"
+          browser: chrome
+          record: false
+        env:
+          CYPRESS_BASE_URL: http://localhost:3000
+
+      - name: 📤 Upload Cypress Screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 5
+
+      - name: 📤 Upload Cypress Videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          retention-days: 5

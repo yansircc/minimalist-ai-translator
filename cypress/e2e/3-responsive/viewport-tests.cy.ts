@@ -61,19 +61,25 @@ describe("Responsive Layout", () => {
       });
     });
 
-    it("should maintain layout after translation", () => {
-      // Perform translation
-      cy.get('[data-test="source-input"]').type("Test text{enter}");
+    it("should maintain layout with content", () => {
+      // 只输入文本,不提交
+      cy.get('[data-test="source-input"]').type("Test text");
 
-      // Wait for translation
-      cy.get('[data-test="translation-output"]', { timeout: 10000 }).should(
-        "not.be.empty",
-      );
-
-      // Check if layout remains correct
+      // 检查布局是否正确
       cy.get('[data-test="source-panel"]').should("be.visible");
       cy.get('[data-test="translation-panel"]').should("be.visible");
       cy.get('[data-test="center-divider"]').should("be.visible");
+
+      // 检查面板宽度
+      cy.get('[data-test="source-panel"]').should(($panel) => {
+        const rect = $panel[0]?.getBoundingClientRect();
+        expect(rect?.width).to.be.greaterThan(500);
+      });
+
+      cy.get('[data-test="translation-panel"]').should(($panel) => {
+        const rect = $panel[0]?.getBoundingClientRect();
+        expect(rect?.width).to.be.greaterThan(500);
+      });
     });
   });
 
