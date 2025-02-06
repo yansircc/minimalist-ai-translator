@@ -47,6 +47,7 @@ describe("Model Selection", () => {
     cy.get('[data-test="model-select"]').select("google");
     cy.get('[data-test="model-select"]').select("openai");
     cy.get('[data-test="model-select"]').select("groq");
+    cy.get('[data-test="model-select"]').select("deepseek");
 
     // Type text after rapid switching
     cy.get('[data-test="source-input"]').type("Test after switching{enter}");
@@ -70,5 +71,8 @@ describe("Model Selection", () => {
     cy.get('[data-test="model-option-openai"]')
       .should("exist")
       .should("have.text", "OpenAI");
+    cy.get('[data-test="model-option-deepseek"]')
+      .should("exist")
+      .should("have.text", "DeepSeek");
   });
 });

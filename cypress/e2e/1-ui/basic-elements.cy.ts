@@ -61,6 +61,9 @@ describe("Basic UI Elements", () => {
     cy.get('[data-test="model-option-openai"]')
       .should("exist")
       .should("have.text", "OpenAI");
+    cy.get('[data-test="model-option-deepseek"]')
+      .should("exist")
+      .should("have.text", "DeepSeek");
 
     // Test model selection
     cy.get('[data-test="model-select"]').select("google");
@@ -68,5 +71,8 @@ describe("Basic UI Elements", () => {
 
     cy.get('[data-test="model-select"]').select("openai");
     cy.get('[data-test="model-select"]').should("have.value", "openai");
+
+    cy.get('[data-test="model-select"]').select("deepseek");
+    cy.get('[data-test="model-select"]').should("have.value", "deepseek");
   });
 });

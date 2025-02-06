@@ -1,6 +1,6 @@
 "use client";
 
-export type ModelType = "groq" | "google" | "openai";
+export type ModelType = "groq" | "google" | "openai" | "deepseek";
 
 export function ModelSelect({
   value,
@@ -25,6 +25,9 @@ export function ModelSelect({
       </option>
       <option value="openai" data-test="model-option-openai">
         OpenAI
+      </option>
+      <option value="deepseek" data-test="model-option-deepseek">
+        DeepSeek
       </option>
     </select>
   );

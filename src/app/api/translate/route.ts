@@ -2,6 +2,7 @@ import { streamText, type Message } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
 import { groq } from "@ai-sdk/groq";
+import { deepseek } from "@ai-sdk/deepseek";
 
 // Define the translation prompt
 const SYSTEM_PROMPT = `You are a professional translation assistant.
@@ -11,7 +12,7 @@ const SYSTEM_PROMPT = `You are a professional translation assistant.
 Ensure the translation is accurate, natural, and idiomatic while retaining the tone and style of the original text.
 Only return the translation result without any extra explanation.`;
 
-type ModelType = "groq" | "google" | "openai";
+type ModelType = "groq" | "google" | "openai" | "deepseek";
 
 // 获取对应的模型实例
 function getModel(modelType: ModelType) {
@@ -22,6 +23,8 @@ function getModel(modelType: ModelType) {
       return groq("llama3-8b-8192");
     case "openai":
       return openai("gpt-4o-mini");
+    case "deepseek":
+      return deepseek("deepseek-coder");
     default:
       return google("gemini-1.5-flash");
   }
