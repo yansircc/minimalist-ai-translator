@@ -1,6 +1,10 @@
 # 极简 AI 翻译
 
+> 一个优雅的现代 AI 翻译工具，将传统翻译器的简洁与 AI 语言模型的强大完美结合。
+
 [English](README.md) | [中文](README.zh-CN.md)
+
+🔗 [在线演示](https://fanyi.xunpanziyou.com/)
 
 一个高颜值、超级方便的 AI 翻译工具，为"老顽固"打造的现代翻译体验。远比在 DeepL 或 Google 翻译中的体验要好得多，也比笨笨地把文本复制粘贴到 ChatGPT 中要快捷非常多。
 

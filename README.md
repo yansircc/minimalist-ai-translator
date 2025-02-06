@@ -1,6 +1,10 @@
 # Minimalist AI Translator
 
+> A sleek, modern AI translation tool that combines the simplicity of traditional translators with the power of AI language models.
+
 [English](README.md) | [中文](README.zh-CN.md)
+
+🔗 [Live Demo](https://fanyi.xunpanziyou.com/)
 
 A beautiful and super convenient AI translation tool, crafted for "traditionalists" who need a modern translation experience.
 
