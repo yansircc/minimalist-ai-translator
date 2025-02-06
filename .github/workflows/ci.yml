@@ -50,9 +50,9 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       - name: 🧪 Install Cypress
-        uses: cypress-io/github-action@v6
-        with:
-          runTests: false
+        run: |
+          bun add -d cypress@latest
+          bun cypress install
 
       - name: 🚀 Start Next.js
         run: bun dev & sleep 10
@@ -60,12 +60,7 @@ jobs:
           PORT: 3000
 
       - name: 🧪 Run Cypress Tests
-        uses: cypress-io/github-action@v6
-        with:
-          install: false
-          wait-on: "http://localhost:3000"
-          browser: chrome
-          record: false
+        run: bun cypress run --browser chrome
         env:
           CYPRESS_BASE_URL: http://localhost:3000
 
