@@ -1,98 +1,40 @@
-// 'use client' 指令，声明这是一个客户端组件
 "use client";
 
-import React, { type KeyboardEvent, useEffect, useRef, useState } from "react";
-import { useChat } from "ai/react";
+import React, { useEffect, useRef, useState } from "react";
 import { Toast } from "@/components/ui/toast";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { CopyButton } from "@/components/translation/copy-button";
-import {
-  ModelSelect,
-  type ModelType,
-} from "@/components/translation/model-select";
+import { ModelSelect } from "@/components/translation/model-select";
 import { Logo } from "@/components/ui/logo";
 import { useTranslationStore } from "@/stores/translation-store";
+import { useClipboardStore } from "@/stores/clipboard-store";
+import { useTranslation } from "@/hooks/use-translation";
+import { handleTranslationKeyDown } from "@/utils/keyboard";
 
-// 翻译组件：包含输入区域和翻译结果展示区域
 export default function TranslationWidget() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [inputText, setInputText] = useState("");
   const [isComposing, setIsComposing] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelType>("google");
-  const [showToast, setShowToast] = useState(false);
-  const {
-    shouldAnimateLogo,
-    setShouldAnimateLogo,
-    setMessages,
-    resetTranslation,
-  } = useTranslationStore();
+
+  // Global state
+  const { shouldAnimateLogo, resetTranslation } = useTranslationStore();
+  const { showToast } = useClipboardStore();
+
+  // Custom hooks
+  const { isLoading, translatedText, append, setChatMessages } =
+    useTranslation();
 
   // Auto-focus the textarea when component mounts
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
 
-  // 使用 useChat hook 处理与 API 的通信
-  const {
-    messages,
-    isLoading,
-    append,
-    setMessages: setChatMessages,
-  } = useChat({
-    api: "/api/translate",
-    body: {
-      model: selectedModel,
-    },
-    onFinish: (message) => {
-      console.log("Translation completed");
-      // First stop the loading animation
-      setShouldAnimateLogo(false);
-
-      // Then trigger the success animation after a short delay
-      setTimeout(() => {
-        setShouldAnimateLogo(true);
-        setTimeout(() => setShouldAnimateLogo(false), 1000);
-      }, 100);
-
-      // Handle clipboard copy
-      if (message) {
-        navigator.clipboard.writeText(message.content.trim()).then(
-          () => {
-            console.log("翻译结果已自动复制到剪贴板");
-            setShowToast(true);
-            setTimeout(() => setShowToast(false), 2000);
-          },
-          (err) => {
-            console.error("自动复制失败:", err);
-          },
-        );
-      }
-    },
-  });
-
-  // 获取最新的翻译结果
-  const lastMessage = messages[messages.length - 1];
-  const translatedText =
-    lastMessage?.role === "assistant" ? lastMessage.content.trim() : null;
-
-  function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  // Event handlers
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
-  }
+  };
 
-  // 处理键盘事件：
-  // - Enter 键（未按住 Shift）触发翻译
-  // - Shift+Enter 插入换行
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    // 如果正在使用输入法，不处理 Enter 键
-    if (isComposing) return;
-
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      void handleTranslate();
-    }
-  }
-
-  async function handleTranslate(e?: React.FormEvent) {
+  const handleTranslate = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!inputText.trim()) return;
 
@@ -104,23 +46,14 @@ export default function TranslationWidget() {
     } catch (error) {
       console.error("Translation failed:", error);
     }
-  }
+  };
 
-  // Handle reset when logo is clicked
   const handleReset = () => {
     setInputText("");
     resetTranslation();
-    // Directly reset chat messages instead of using reload
     setChatMessages([]);
     textareaRef.current?.focus();
   };
-
-  // Update store messages when chat messages change
-  useEffect(() => {
-    if (messages.length > 0) {
-      setMessages(messages);
-    }
-  }, [messages, setMessages]);
 
   return (
     <div
@@ -133,7 +66,7 @@ export default function TranslationWidget() {
         data-test="nav-controls"
       >
         <ThemeToggle />
-        <ModelSelect value={selectedModel} onChange={setSelectedModel} />
+        <ModelSelect />
         <Logo
           onReset={handleReset}
           shouldAnimate={shouldAnimateLogo || isLoading}
@@ -154,9 +87,15 @@ export default function TranslationWidget() {
               data-test="source-input"
               className="scrollbar-thin h-full w-full resize-none overflow-y-auto bg-transparent px-4 py-4 text-lg focus:outline-none dark:placeholder:text-zinc-600 md:px-8"
               value={inputText}
-              placeholder="输入或粘贴要翻译的文本..."
+              placeholder="Input here..."
               onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) =>
+                handleTranslationKeyDown(
+                  e,
+                  isComposing,
+                  () => void handleTranslate(),
+                )
+              }
               onCompositionStart={() => setIsComposing(true)}
               onCompositionEnd={() => setIsComposing(false)}
               autoFocus
@@ -187,7 +126,7 @@ export default function TranslationWidget() {
       </div>
 
       {/* Toast notification */}
-      {showToast && <Toast message="已复制到剪贴板" data-test="copy-toast" />}
+      {showToast && <Toast message="Copied" data-test="copy-toast" />}
     </div>
   );
 }

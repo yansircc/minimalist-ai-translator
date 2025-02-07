@@ -32,6 +32,11 @@ function getModel(modelType: ModelType) {
 
 // Export the POST handler function
 export async function POST(req: Request) {
+  const timeoutMs = 30000; // 30 seconds
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("Request timeout")), timeoutMs),
+  );
+
   try {
     // Get the text from the request body
     const { messages, model } = (await req.json()) as {
@@ -39,17 +44,33 @@ export async function POST(req: Request) {
       model: ModelType;
     };
 
-    // Call the API for translation using streamText
-    const stream = streamText({
-      model: getModel(model),
-      system: SYSTEM_PROMPT,
-      messages,
-    });
+    // Validate input
+    if (!messages?.length || !messages[0]?.content) {
+      return new Response("Invalid request: missing content", { status: 400 });
+    }
 
-    // Return the streaming response directly
-    return stream.toDataStreamResponse();
+    try {
+      // Call the API for translation using streamText with timeout
+      const stream = streamText({
+        model: getModel(model),
+        system: SYSTEM_PROMPT,
+        messages,
+      });
+
+      // Race between the stream and timeout
+      const response = stream.toDataStreamResponse();
+      return await Promise.race([response, timeoutPromise]);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Request timeout") {
+        return new Response("Request timeout", { status: 408 });
+      }
+      throw error; // Re-throw other errors
+    }
   } catch (error) {
     console.error("Translation API error:", error);
-    return new Response("Internal Server Error", { status: 500 });
+    return new Response(
+      error instanceof Error ? error.message : "Internal Server Error",
+      { status: 500 },
+    );
   }
 }
