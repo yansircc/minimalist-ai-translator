@@ -18,7 +18,7 @@ describe("Basic UI Elements", () => {
     cy.get('[data-test="source-panel"]').should("exist");
     cy.get('[data-test="source-input"]')
       .should("exist")
-      .should("have.attr", "placeholder", "输入或粘贴要翻译的文本...");
+      .should("have.attr", "placeholder", "Input here...");
 
     cy.get('[data-test="center-divider"]').should("exist");
 

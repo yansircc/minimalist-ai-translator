@@ -49,7 +49,7 @@ describe("Translation Functionality", () => {
     cy.get('[data-test="source-input"]')
       .should("exist")
       .should("be.visible")
-      .should("have.attr", "placeholder", "输入或粘贴要翻译的文本...");
+      .should("have.attr", "placeholder", "Input here...");
 
     // 检查输出区域
     cy.get('[data-test="translation-output"]')
