@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**Use 'bun' as default package manager.**
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
@@ -10,19 +12,19 @@ This is an AI-powered translation web application built with Next.js 15, React 1
 
 ```bash
 # Start development server with Turbo
-npm run dev
+bun dev
 
 # Build for production
-npm run build
+bun run build
 
 # Run production server
-npm run start
+bun run start
 
 # Type checking and linting
-npm run check
+bun check
 
 # Run Cypress E2E tests
-npm run cy:open
+bun cy:open
 ```
 
 ## Architecture
