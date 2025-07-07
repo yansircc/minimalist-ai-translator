@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAppStore } from "@/stores/app-store";
 
 export function useTranslation() {
-	const { selectedModel, setShouldAnimateLogo, setMessages, copyToClipboard } =
+	const { apiConfig, setShouldAnimateLogo, setMessages, copyToClipboard } =
 		useAppStore();
 
 	const {
@@ -15,10 +15,9 @@ export function useTranslation() {
 	} = useChat({
 		api: "/api/translate",
 		body: {
-			model: selectedModel,
+			apiConfig,
 		},
 		onFinish: (message) => {
-			console.log("Translation completed");
 			// Handle logo animation
 			setShouldAnimateLogo(false);
 			setTimeout(() => {
@@ -27,9 +26,13 @@ export function useTranslation() {
 			}, 100);
 
 			// Copy result to clipboard
-			if (message) {
+			if (message && message.content) {
 				void copyToClipboard(message.content);
 			}
+		},
+		onError: (error) => {
+			console.error("Translation error:", error);
+			// Error is already handled in TranslationWidget
 		},
 	});
 

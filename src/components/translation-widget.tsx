@@ -2,11 +2,12 @@
 
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { SettingsDialog } from "@/components/settings-dialog";
 import { CopyButton } from "@/components/translation/copy-button";
-import { ModelSelect } from "@/components/translation/model-select";
 import { TranslationErrorFallback } from "@/components/translation/translation-error-fallback";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Logo } from "@/components/ui/logo";
+import { SettingsButton } from "@/components/ui/settings-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Toast } from "@/components/ui/toast";
 import { useTranslation } from "@/hooks/use-translation";
@@ -17,6 +18,7 @@ export default function TranslationWidget() {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [inputText, setInputText] = useState("");
 	const [isComposing, setIsComposing] = useState(false);
+	const [showSettings, setShowSettings] = useState(false);
 
 	// Global state from unified store
 	const {
@@ -27,6 +29,8 @@ export default function TranslationWidget() {
 		toastType,
 		setError,
 		clearError,
+		isConfigured,
+		showToastMessage,
 	} = useAppStore();
 
 	// Custom hooks
@@ -46,6 +50,13 @@ export default function TranslationWidget() {
 	const handleTranslate = async (e?: React.FormEvent) => {
 		e?.preventDefault();
 		if (!inputText.trim()) return;
+
+		// Check if API is configured
+		if (!isConfigured()) {
+			showToastMessage("Please configure your API key in settings", "error");
+			setShowSettings(true);
+			return;
+		}
 
 		try {
 			clearError();
@@ -80,7 +91,7 @@ export default function TranslationWidget() {
 				data-test="nav-controls"
 			>
 				<ThemeToggle />
-				<ModelSelect />
+				<SettingsButton onClick={() => setShowSettings(true)} />
 				<Logo
 					onReset={handleReset}
 					shouldAnimate={shouldAnimateLogo || isLoading}
@@ -150,6 +161,10 @@ export default function TranslationWidget() {
 			{showToast && (
 				<Toast message={toastMessage} type={toastType} data-test="copy-toast" />
 			)}
+			<SettingsDialog
+				isOpen={showSettings}
+				onClose={() => setShowSettings(false)}
+			/>
 		</div>
 	);
 }

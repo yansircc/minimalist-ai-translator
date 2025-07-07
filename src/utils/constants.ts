@@ -15,11 +15,3 @@ export const API_TIMEOUT_MS = 30000; // 30 seconds
 
 // UI Configuration
 export const TOAST_DURATION_MS = 2000; // 2 seconds
-
-// Model Configuration
-export const MODEL_CONFIGS = {
-	google: { model: "gemini-1.5-flash" },
-	groq: { model: "llama3-8b-8192" },
-	openai: { model: "gpt-4o-mini" },
-	deepseek: { model: "deepseek-coder" },
-} as const;

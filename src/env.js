@@ -8,10 +8,8 @@ export const env = createEnv({
 	 */
 	server: {
 		NODE_ENV: z.enum(["development", "test", "production"]),
-		OPENAI_API_KEY: z.string().min(1),
-		GROQ_API_KEY: z.string().min(1),
-		GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
-		DEEPSEEK_API_KEY: z.string().min(1),
+		// API keys are now optional since users provide their own
+		OPENAI_API_KEY: z.string().optional(),
 	},
 
 	/**
@@ -29,10 +27,7 @@ export const env = createEnv({
 	 */
 	runtimeEnv: {
 		NODE_ENV: process.env.NODE_ENV,
-		OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-		GROQ_API_KEY: process.env.GROQ_API_KEY,
-		GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-		DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
+		OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
 		// NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 	},
 	/**

@@ -1,27 +1,23 @@
-import { deepseek } from "@ai-sdk/deepseek";
-import { google } from "@ai-sdk/google";
-import { groq } from "@ai-sdk/groq";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { type Message, streamText } from "ai";
-import type { AIModelType } from "@/types";
-import {
-	API_TIMEOUT_MS,
-	MODEL_CONFIGS,
-	TRANSLATION_SYSTEM_PROMPT,
-} from "@/utils/constants";
+import type { APIConfig } from "@/types";
+import { API_TIMEOUT_MS, TRANSLATION_SYSTEM_PROMPT } from "@/utils/constants";
 
 // 获取对应的模型实例
-function getModel(modelType: AIModelType) {
-	const modelProviders = {
-		google: google,
-		groq: groq,
-		openai: openai,
-		deepseek: deepseek,
-	};
-
-	const provider = modelProviders[modelType] || google;
-	const config = MODEL_CONFIGS[modelType] || MODEL_CONFIGS.google;
-	return provider(config.model);
+function getModel(config: APIConfig) {
+	if (config.provider === "openai") {
+		const customOpenAI = createOpenAI({
+			apiKey: config.apiKey,
+		});
+		return customOpenAI(config.model);
+	} else {
+		// Custom provider
+		const customOpenAI = createOpenAI({
+			baseURL: config.baseURL,
+			apiKey: config.apiKey,
+		});
+		return customOpenAI(config.model);
+	}
 }
 
 // Export the POST handler function
@@ -31,10 +27,10 @@ export async function POST(req: Request) {
 	);
 
 	try {
-		// Get the text from the request body
-		const { messages, model } = (await req.json()) as {
+		// Get the request data
+		const { messages, apiConfig } = (await req.json()) as {
 			messages: Message[];
-			model: AIModelType;
+			apiConfig: APIConfig;
 		};
 
 		// Validate input
@@ -42,10 +38,16 @@ export async function POST(req: Request) {
 			return new Response("Invalid request: missing content", { status: 400 });
 		}
 
+		if (!apiConfig?.apiKey || !apiConfig?.model) {
+			return new Response("Invalid request: missing API configuration", {
+				status: 400,
+			});
+		}
+
 		try {
 			// Call the API for translation using streamText with timeout
 			const stream = streamText({
-				model: getModel(model),
+				model: getModel(apiConfig),
 				system: TRANSLATION_SYSTEM_PROMPT,
 				messages,
 			});

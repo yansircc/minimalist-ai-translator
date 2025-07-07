@@ -1,7 +1,7 @@
 import type { Message } from "ai";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { AIModelType, ToastType } from "@/types";
+import { type APIConfig, DEFAULT_API_CONFIG, type ToastType } from "@/types";
 
 interface TranslationSlice {
 	shouldAnimateLogo: boolean;
@@ -11,9 +11,11 @@ interface TranslationSlice {
 	resetTranslation: () => void;
 }
 
-interface ModelSlice {
-	selectedModel: AIModelType;
-	setSelectedModel: (model: AIModelType) => void;
+interface APIConfigSlice {
+	apiConfig: APIConfig;
+	setAPIConfig: (config: Partial<APIConfig>) => void;
+	resetAPIConfig: () => void;
+	isConfigured: () => boolean;
 }
 
 interface ClipboardSlice {
@@ -36,7 +38,7 @@ interface ErrorSlice {
 
 export interface AppStore
 	extends TranslationSlice,
-		ModelSlice,
+		APIConfigSlice,
 		ClipboardSlice,
 		ErrorSlice {
 	// Global actions
@@ -53,9 +55,17 @@ export const useAppStore = create<AppStore>()(
 			setMessages: (messages) => set({ messages }),
 			resetTranslation: () => set({ shouldAnimateLogo: false, messages: [] }),
 
-			// Model Slice
-			selectedModel: "google",
-			setSelectedModel: (model) => set({ selectedModel: model }),
+			// API Config Slice
+			apiConfig: DEFAULT_API_CONFIG,
+			setAPIConfig: (config) =>
+				set((state) => ({
+					apiConfig: { ...state.apiConfig, ...config },
+				})),
+			resetAPIConfig: () => set({ apiConfig: DEFAULT_API_CONFIG }),
+			isConfigured: () => {
+				const { apiConfig } = get();
+				return !!apiConfig.apiKey && !!apiConfig.model;
+			},
 
 			// Clipboard Slice
 			showToast: false,
@@ -112,8 +122,8 @@ export const useAppStore = create<AppStore>()(
 			name: "ai-translate-app-store",
 			storage: createJSONStorage(() => localStorage),
 			partialize: (state) => ({
-				// Only persist user preferences
-				selectedModel: state.selectedModel,
+				// Only persist user preferences and API config
+				apiConfig: state.apiConfig,
 			}),
 		},
 	),
