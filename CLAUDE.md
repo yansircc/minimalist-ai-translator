@@ -32,8 +32,11 @@ bun cy:open
 The application follows Next.js App Router conventions with a clean separation of concerns:
 
 - **API Route**: `/api/translate` - Handles AI translation requests with streaming responses
-- **State Management**: Zustand stores in `src/stores/` for translation state, clipboard, and model selection
+- **State Management**: Unified Zustand store in `src/stores/app-store.ts` managing all application state
+- **Type System**: Centralized type definitions in `src/types/index.ts`
+- **Constants**: Configuration and constants in `src/utils/constants.ts`
 - **Components**: Split between `ui/` (reusable UI components) and `translation/` (feature-specific components)
+- **Error Handling**: Global error boundaries and translation-specific error fallbacks
 - **Main Interface**: `src/components/translation-widget.tsx` contains the primary translation UI logic
 
 ## Key Implementation Details
@@ -75,8 +78,18 @@ E2E tests are written in Cypress and located in `cypress/e2e/`. Tests cover:
 
 ## Important Patterns
 
-1. **Custom Hooks**: Translation logic is centralized in `src/hooks/use-translation.tsx`
-2. **Keyboard Handling**: Enter to translate, Shift+Enter for newline (see `translation-widget.tsx`)
-3. **Theme Support**: Dark/light mode via next-themes
-4. **Error Boundaries**: API errors are handled with user-friendly messages
-5. **Type Safety**: Extensive use of TypeScript for all components and utilities
+1. **Unified State Management**: All state is managed through a single `useAppStore` with slices for different concerns
+2. **Custom Hooks**: Translation logic is centralized in `src/hooks/use-translation.ts`
+3. **Keyboard Handling**: Enter to translate, Shift+Enter for newline (see `utils/keyboard.ts`)
+4. **Error Handling**: 
+   - Global `ErrorBoundary` component wraps the entire app
+   - `TranslationErrorFallback` for translation-specific errors
+   - Toast notifications for user feedback (success/error/info types)
+5. **Type Safety**: 
+   - Centralized types in `src/types/index.ts`
+   - Strict TypeScript configuration
+   - No unchecked indexed access
+6. **Performance**: 
+   - React Compiler enabled (experimental)
+   - Streaming responses for real-time translation
+   - Optimized scroll handling for long texts

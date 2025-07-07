@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import { useAppStore } from "@/stores/app-store";
 
 export function useTranslation() {
-	const { selectedModel, setShouldAnimateLogo, setMessages, copyToClipboard } = useAppStore();
+	const { selectedModel, setShouldAnimateLogo, setMessages, copyToClipboard } =
+		useAppStore();
 
 	const {
 		messages,

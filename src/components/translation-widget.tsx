@@ -4,13 +4,13 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { CopyButton } from "@/components/translation/copy-button";
 import { ModelSelect } from "@/components/translation/model-select";
+import { TranslationErrorFallback } from "@/components/translation/translation-error-fallback";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Toast } from "@/components/ui/toast";
 import { useTranslation } from "@/hooks/use-translation";
 import { useAppStore } from "@/stores/app-store";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { TranslationErrorFallback } from "@/components/translation/translation-error-fallback";
 import { handleTranslationKeyDown } from "@/utils/keyboard";
 
 export default function TranslationWidget() {
@@ -19,7 +19,15 @@ export default function TranslationWidget() {
 	const [isComposing, setIsComposing] = useState(false);
 
 	// Global state from unified store
-	const { shouldAnimateLogo, resetTranslation, showToast, toastMessage, toastType, setError, clearError } = useAppStore();
+	const {
+		shouldAnimateLogo,
+		resetTranslation,
+		showToast,
+		toastMessage,
+		toastType,
+		setError,
+		clearError,
+	} = useAppStore();
 
 	// Custom hooks
 	const { isLoading, translatedText, append, setChatMessages } =
@@ -46,7 +54,8 @@ export default function TranslationWidget() {
 				role: "user",
 			});
 		} catch (error) {
-			const err = error instanceof Error ? error : new Error("Translation failed");
+			const err =
+				error instanceof Error ? error : new Error("Translation failed");
 			setError(err);
 			console.error("Translation failed:", error);
 		}
@@ -138,7 +147,9 @@ export default function TranslationWidget() {
 			</div>
 
 			{/* Toast notification */}
-			{showToast && <Toast message={toastMessage} type={toastType} data-test="copy-toast" />}
+			{showToast && (
+				<Toast message={toastMessage} type={toastType} data-test="copy-toast" />
+			)}
 		</div>
 	);
 }

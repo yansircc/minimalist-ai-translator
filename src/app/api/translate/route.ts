@@ -3,45 +3,38 @@ import { google } from "@ai-sdk/google";
 import { groq } from "@ai-sdk/groq";
 import { openai } from "@ai-sdk/openai";
 import { type Message, streamText } from "ai";
-
-// Define the translation prompt
-const SYSTEM_PROMPT = `You are a professional translation assistant.
-- If the input is in Chinese, translate it into English;
-- If the input is in English, translate it into Chinese;
-- For any other language, first detect the language, then translate it to Chinese.
-Ensure the translation is accurate, natural, and idiomatic while retaining the tone and style of the original text.
-Only return the translation result without any extra explanation.`;
-
-type ModelType = "groq" | "google" | "openai" | "deepseek";
+import type { AIModelType } from "@/types";
+import {
+	API_TIMEOUT_MS,
+	MODEL_CONFIGS,
+	TRANSLATION_SYSTEM_PROMPT,
+} from "@/utils/constants";
 
 // 获取对应的模型实例
-function getModel(modelType: ModelType) {
-	switch (modelType) {
-		case "google":
-			return google("gemini-1.5-flash");
-		case "groq":
-			return groq("llama3-8b-8192");
-		case "openai":
-			return openai("gpt-4o-mini");
-		case "deepseek":
-			return deepseek("deepseek-coder");
-		default:
-			return google("gemini-1.5-flash");
-	}
+function getModel(modelType: AIModelType) {
+	const modelProviders = {
+		google: google,
+		groq: groq,
+		openai: openai,
+		deepseek: deepseek,
+	};
+
+	const provider = modelProviders[modelType] || google;
+	const config = MODEL_CONFIGS[modelType] || MODEL_CONFIGS.google;
+	return provider(config.model);
 }
 
 // Export the POST handler function
 export async function POST(req: Request) {
-	const timeoutMs = 30000; // 30 seconds
 	const timeoutPromise = new Promise<never>((_, reject) =>
-		setTimeout(() => reject(new Error("Request timeout")), timeoutMs),
+		setTimeout(() => reject(new Error("Request timeout")), API_TIMEOUT_MS),
 	);
 
 	try {
 		// Get the text from the request body
 		const { messages, model } = (await req.json()) as {
 			messages: Message[];
-			model: ModelType;
+			model: AIModelType;
 		};
 
 		// Validate input
@@ -53,7 +46,7 @@ export async function POST(req: Request) {
 			// Call the API for translation using streamText with timeout
 			const stream = streamText({
 				model: getModel(model),
-				system: SYSTEM_PROMPT,
+				system: TRANSLATION_SYSTEM_PROMPT,
 				messages,
 			});
 

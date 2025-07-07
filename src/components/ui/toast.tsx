@@ -1,8 +1,10 @@
 "use client";
 
+import type { ToastType } from "@/types";
+
 interface ToastProps {
 	message: string;
-	type?: "success" | "error" | "info";
+	type?: ToastType;
 }
 
 // Toast 组件
