@@ -16,7 +16,6 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="zh-CN" suppressHydrationWarning>
-			<head />
 			<body
 				className={`${GeistSans.variable} min-h-screen bg-white text-zinc-800 antialiased transition-colors dark:bg-zinc-900 dark:text-zinc-100`}
 			>

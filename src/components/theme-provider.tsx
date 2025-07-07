@@ -12,6 +12,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 			defaultTheme="system"
 			enableSystem
 			disableTransitionOnChange
+			storageKey="ai-translate-theme"
 			{...props}
 		>
 			{children}
