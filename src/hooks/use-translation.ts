@@ -1,14 +1,10 @@
 import type { Message } from "ai";
 import { useChat } from "ai/react";
 import { useEffect } from "react";
-import { useClipboardStore } from "@/stores/clipboard-store";
-import { useModelStore } from "@/stores/model-store";
-import { useTranslationStore } from "@/stores/translation-store";
+import { useAppStore } from "@/stores/app-store";
 
 export function useTranslation() {
-	const { selectedModel } = useModelStore();
-	const { setShouldAnimateLogo, setMessages } = useTranslationStore();
-	const { copyToClipboard } = useClipboardStore();
+	const { selectedModel, setShouldAnimateLogo, setMessages, copyToClipboard } = useAppStore();
 
 	const {
 		messages,

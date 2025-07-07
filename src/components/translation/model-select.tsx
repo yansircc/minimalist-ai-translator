@@ -1,11 +1,11 @@
 "use client";
 
-import { useModelStore } from "@/stores/model-store";
+import { useAppStore } from "@/stores/app-store";
 
 export type ModelType = "groq" | "google" | "openai" | "deepseek";
 
 export function ModelSelect() {
-	const { selectedModel, setSelectedModel } = useModelStore();
+	const { selectedModel, setSelectedModel } = useAppStore();
 
 	return (
 		<select

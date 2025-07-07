@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export const metadata: Metadata = {
 	title: "AI极简翻译",
@@ -19,7 +20,9 @@ export default function RootLayout({
 			<body
 				className={`${GeistSans.variable} min-h-screen bg-white text-zinc-800 antialiased transition-colors dark:bg-zinc-900 dark:text-zinc-100`}
 			>
-				<ThemeProvider>{children}</ThemeProvider>
+				<ThemeProvider>
+					<ErrorBoundary>{children}</ErrorBoundary>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

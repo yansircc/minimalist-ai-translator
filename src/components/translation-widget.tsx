@@ -8,8 +8,9 @@ import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Toast } from "@/components/ui/toast";
 import { useTranslation } from "@/hooks/use-translation";
-import { useClipboardStore } from "@/stores/clipboard-store";
-import { useTranslationStore } from "@/stores/translation-store";
+import { useAppStore } from "@/stores/app-store";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { TranslationErrorFallback } from "@/components/translation/translation-error-fallback";
 import { handleTranslationKeyDown } from "@/utils/keyboard";
 
 export default function TranslationWidget() {
@@ -17,9 +18,8 @@ export default function TranslationWidget() {
 	const [inputText, setInputText] = useState("");
 	const [isComposing, setIsComposing] = useState(false);
 
-	// Global state
-	const { shouldAnimateLogo, resetTranslation } = useTranslationStore();
-	const { showToast } = useClipboardStore();
+	// Global state from unified store
+	const { shouldAnimateLogo, resetTranslation, showToast, toastMessage, toastType, setError, clearError } = useAppStore();
 
 	// Custom hooks
 	const { isLoading, translatedText, append, setChatMessages } =
@@ -40,11 +40,14 @@ export default function TranslationWidget() {
 		if (!inputText.trim()) return;
 
 		try {
+			clearError();
 			await append({
 				content: inputText,
 				role: "user",
 			});
 		} catch (error) {
+			const err = error instanceof Error ? error : new Error("Translation failed");
+			setError(err);
 			console.error("Translation failed:", error);
 		}
 	};
@@ -53,6 +56,7 @@ export default function TranslationWidget() {
 		setInputText("");
 		resetTranslation();
 		setChatMessages([]);
+		clearError();
 		textareaRef.current?.focus();
 	};
 
@@ -111,22 +115,30 @@ export default function TranslationWidget() {
 
 				{/* Right panel - Translation result */}
 				<div
-					className="scrollbar-thin flex h-[calc(50vh-32px)] w-full flex-col overflow-auto md:h-[calc(100vh-64px)] md:w-1/2"
+					className="scrollbar-thin h-[calc(50vh-32px)] w-full overflow-auto md:h-[calc(100vh-64px)] md:w-1/2"
 					data-test="translation-panel"
 				>
-					<div className="h-full w-full">
+					<ErrorBoundary
+						fallback={(error, reset) => (
+							<TranslationErrorFallback
+								error={error}
+								reset={reset}
+								retry={() => handleTranslate()}
+							/>
+						)}
+					>
 						<div
-							className="h-full whitespace-pre-wrap px-4 py-4 text-lg text-zinc-500 md:px-8 dark:text-zinc-400"
+							className="min-h-full whitespace-pre-wrap px-4 py-4 text-lg text-zinc-500 md:px-8 dark:text-zinc-400"
 							data-test="translation-output"
 						>
 							{translatedText ?? ""}
 						</div>
-					</div>
+					</ErrorBoundary>
 				</div>
 			</div>
 
 			{/* Toast notification */}
-			{showToast && <Toast message="Copied" data-test="copy-toast" />}
+			{showToast && <Toast message={toastMessage} type={toastType} data-test="copy-toast" />}
 		</div>
 	);
 }
